@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class BallController : MonoBehaviour {
     public float m_speed;
@@ -9,9 +10,12 @@ public class BallController : MonoBehaviour {
     public GameObject m_topWall;
     public GameObject m_paddle;
     public GameObject m_bricksParent;
+    public GameObject m_scoreBoard;
+    public GameObject m_livesBoard;
 
     private float m_dx = 0.0f;
     private float m_dy = 0.0f; 
+    private int m_score = 0;
 
     private float rad2deg(float rad) {
         return (rad * 180.0f) / Mathf.PI;
@@ -31,8 +35,14 @@ public class BallController : MonoBehaviour {
         m_dy = m_speed * Mathf.Sin(deg2rad (angle));
     }
 
+    private void UpdateScoreBoard() {
+        Text scoreText = m_scoreBoard.GetComponent<Text>();
+        scoreText.text = System.String.Format("Score:{0}", m_score);        
+    }
+    
     // Use this for initialization
     void Start () {
+        UpdateScoreBoard();
     }
     
     // Update is called once per frame
@@ -68,6 +78,8 @@ public class BallController : MonoBehaviour {
                 if (this.doesCollide (thisBounds, brickTransform.gameObject)) {
                     m_dy *= -1.0f;
                     Destroy(brickTransform.gameObject);
+                    m_score += 100;
+                    UpdateScoreBoard();                    
                     found = true;
                 }                
             }
