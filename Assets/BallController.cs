@@ -14,8 +14,7 @@ public class BallController : MonoBehaviour {
     public GameObject m_livesBoard;
     public GameObject m_gameOverText;
 
-    private float m_dx = 0.0f;
-    private float m_dy = 0.0f; 
+    private Vector2 m_move;
     private int m_score = 0;
     private int m_lives = 3;
     private bool m_isPlaying = false;
@@ -33,9 +32,10 @@ public class BallController : MonoBehaviour {
         return thisBounds.Intersects(thatBounds);
     }
 
-    void setDeltas(float angle) {
-        m_dx = m_speed * Mathf.Cos(deg2rad (angle));
-        m_dy = m_speed * Mathf.Sin(deg2rad (angle));
+    private void setDeltas(float angle) {
+        float dx = m_speed * Mathf.Cos(deg2rad (angle));
+        float dy = m_speed * Mathf.Sin(deg2rad (angle));
+        m_move = new Vector2(dx, dy);
     }
 
     private void UpdateScoreBoard() {
@@ -48,17 +48,16 @@ public class BallController : MonoBehaviour {
         livesBoard.text = System.String.Format("Lives:{0}", m_lives);        
     }
     
-    // Use this for initialization
-    void Start () {
+    void Start () {        
+        m_move = new Vector2(0.0f,0.0f);
         UpdateScoreBoard();
         UpdateLivesBoard();
     }
     
-    // Update is called once per frame
     void Update () {
         Bounds thisBounds = this.GetComponent<SpriteRenderer> ().bounds;
         if (this.doesCollide (thisBounds, m_paddle)) {
-            if (m_dy < 0) {
+            if (m_move.y < 0) {
                 float ratio = 
                     (this.transform.position.x - m_paddle.transform.position.x) / 
                     (0.5f * m_paddle.GetComponent<SpriteRenderer>().bounds.size.x);
@@ -67,16 +66,16 @@ public class BallController : MonoBehaviour {
                 this.setDeltas(angle);              
             }
         } else if (this.doesCollide (thisBounds, m_rightWall)) {
-            if (m_dx > 0) {
-                m_dx *= -1.0f;
+            if (m_move.x > 0) {
+                m_move.x *= -1.0f;
             }
         } else if (this.doesCollide (thisBounds, m_leftWall)) {
-            if (m_dx < 0) {
-                m_dx *= -1.0f;
+            if (m_move.x < 0) {
+                m_move.x *= -1.0f;
             }
         } else if (this.doesCollide (thisBounds, m_topWall)) {
-            if (m_dy > 0) {
-                m_dy *= -1.0f;
+            if (m_move.y > 0) {
+                m_move.y *= -1.0f;
             }
         } else {
             bool found = false;
@@ -85,7 +84,7 @@ public class BallController : MonoBehaviour {
             {
                 Transform brickTransform = en.Current as Transform;
                 if (this.doesCollide (thisBounds, brickTransform.gameObject)) {
-                    m_dy *= -1.0f;
+                    m_move.y *= -1.0f;
                     Destroy(brickTransform.gameObject);
                     m_score += 100;
                     UpdateScoreBoard();                    
@@ -96,8 +95,7 @@ public class BallController : MonoBehaviour {
 
         if (m_isPlaying && this.transform.position.y < -5.0f)
         {
-            this.m_dy = 0.0f;
-            this.m_dx = 0.0f;            
+            m_move = new Vector2(0.0f, 0.0f);
             m_lives -= 1;
             UpdateLivesBoard();
             m_isPlaying = false;
@@ -127,6 +125,8 @@ public class BallController : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        this.transform.Translate (Time.fixedDeltaTime * m_dx, Time.fixedDeltaTime * m_dy, 0);
+        this.transform.Translate (Time.fixedDeltaTime * m_move.x, 
+                                  Time.fixedDeltaTime * m_move.y, 
+                                  0);
     }
 }
