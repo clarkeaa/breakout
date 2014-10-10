@@ -37,9 +37,13 @@ public class BallController : MonoBehaviour {
     private float deg2rad(float rad) {
         return (rad * Mathf.PI) / 180.0f;
     }
+    
+    private static Bounds getBounds(GameObject go) {
+        return go.GetComponent<SpriteRenderer> ().bounds;
+    }
 
     private static bool doesCollide(Bounds thisBounds, GameObject go) {
-        Bounds thatBounds = go.GetComponent<SpriteRenderer> ().bounds;
+        Bounds thatBounds = getBounds(go);
         return thisBounds.Intersects(thatBounds);
     }
 
@@ -66,12 +70,12 @@ public class BallController : MonoBehaviour {
     }
     
     void Update () {
-        Bounds thisBounds = this.GetComponent<SpriteRenderer> ().bounds;
+        Bounds thisBounds = getBounds(this.gameObject);
         if (this.doesCollide (thisBounds, m_paddle)) {
             if (m_move.y < 0) {
                 float ratio = 
                     (this.transform.position.x - m_paddle.transform.position.x) / 
-                    (0.5f * m_paddle.GetComponent<SpriteRenderer>().bounds.size.x);
+                    (0.5f * getBounds(m_paddle).size.x);
                 ratio = Mathf.Clamp(ratio, -1.0f, 1.0f);
                 float angle = (-1.0f * 80.0f * ratio) + 90.0f;
                 this.setDeltas(angle);              
