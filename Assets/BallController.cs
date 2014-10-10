@@ -112,9 +112,16 @@ public class BallController : MonoBehaviour {
         if (Input.GetButton("Fire1")) {
             if (!m_isPlaying)
             {
-                this.setDeltas (315.0f);                
-                this.transform.position = new Vector3(-15.0f, 25.0f, 0.0f);                          
-                m_isPlaying = true;
+                if (m_lives <=0)
+                {
+                    Application.LoadLevel ("Level1");
+                }
+                else
+                {
+                    this.setDeltas (315.0f);                
+                    this.transform.position = new Vector3(-15.0f, 25.0f, 0.0f);                          
+                    m_isPlaying = true;                    
+                }
             } 
         }
     }
