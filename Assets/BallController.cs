@@ -12,10 +12,13 @@ public class BallController : MonoBehaviour {
     public GameObject m_bricksParent;
     public GameObject m_scoreBoard;
     public GameObject m_livesBoard;
+    public GameObject m_gameOverText;
 
     private float m_dx = 0.0f;
     private float m_dy = 0.0f; 
     private int m_score = 0;
+    private int m_lives = 3;
+    private bool m_isPlaying = false;
 
     private float rad2deg(float rad) {
         return (rad * 180.0f) / Mathf.PI;
@@ -39,10 +42,16 @@ public class BallController : MonoBehaviour {
         Text scoreText = m_scoreBoard.GetComponent<Text>();
         scoreText.text = System.String.Format("Score:{0}", m_score);        
     }
+
+    private void UpdateLivesBoard() {
+        Text livesBoard = m_livesBoard.GetComponent<Text>();
+        livesBoard.text = System.String.Format("Lives:{0}", m_lives);        
+    }
     
     // Use this for initialization
     void Start () {
         UpdateScoreBoard();
+        UpdateLivesBoard();
     }
     
     // Update is called once per frame
@@ -85,22 +94,28 @@ public class BallController : MonoBehaviour {
             }
         }
 
-        if (this.transform.position.y < -5.0f)
+        if (m_isPlaying && this.transform.position.y < -5.0f)
         {
             this.m_dy = 0.0f;
             this.m_dx = 0.0f;            
+            m_lives -= 1;
+            UpdateLivesBoard();
+            m_isPlaying = false;
+
+            if (m_lives <= 0)
+            {
+                m_gameOverText.GetComponent<CanvasGroup>().alpha = 1.0f;
+            }
         }
         
 
         if (Input.GetButton("Fire1")) {
-            if (this.transform.position.y < 0.0f)
-            {
-                this.transform.position = new Vector3(-15.0f, 25.0f, 0.0f);                          
-            } 
-            else
+            if (!m_isPlaying)
             {
                 this.setDeltas (315.0f);                
-            }
+                this.transform.position = new Vector3(-15.0f, 25.0f, 0.0f);                          
+                m_isPlaying = true;
+            } 
         }
     }
 
