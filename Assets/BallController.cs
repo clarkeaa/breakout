@@ -4,15 +4,26 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 
 public class BallController : MonoBehaviour {
+
+    [System.SerializableAttribute]
+    public class Walls {
+        public GameObject m_left;
+        public GameObject m_right;
+        public GameObject m_top;        
+    }
+
+    [System.SerializableAttribute]
+    public class UI {
+        public GameObject m_scoreBoard;
+        public GameObject m_livesBoard;
+        public GameObject m_gameOverText;
+    }
+
     public float m_speed;
-    public GameObject m_leftWall;
-    public GameObject m_rightWall;
-    public GameObject m_topWall;
     public GameObject m_paddle;
     public GameObject m_bricksParent;
-    public GameObject m_scoreBoard;
-    public GameObject m_livesBoard;
-    public GameObject m_gameOverText;
+    public Walls m_walls;
+    public UI m_ui;
 
     private Vector2 m_move;
     private int m_score = 0;
@@ -39,12 +50,12 @@ public class BallController : MonoBehaviour {
     }
 
     private void UpdateScoreBoard() {
-        Text scoreText = m_scoreBoard.GetComponent<Text>();
+        Text scoreText = m_ui.m_scoreBoard.GetComponent<Text>();
         scoreText.text = System.String.Format("Score:{0}", m_score);        
     }
 
     private void UpdateLivesBoard() {
-        Text livesBoard = m_livesBoard.GetComponent<Text>();
+        Text livesBoard = m_ui.m_livesBoard.GetComponent<Text>();
         livesBoard.text = System.String.Format("Lives:{0}", m_lives);        
     }
     
@@ -65,15 +76,15 @@ public class BallController : MonoBehaviour {
                 float angle = (-1.0f * 80.0f * ratio) + 90.0f;
                 this.setDeltas(angle);              
             }
-        } else if (this.doesCollide (thisBounds, m_rightWall)) {
+        } else if (this.doesCollide (thisBounds, m_walls.m_right)) {
             if (m_move.x > 0) {
                 m_move.x *= -1.0f;
             }
-        } else if (this.doesCollide (thisBounds, m_leftWall)) {
+        } else if (this.doesCollide (thisBounds, m_walls.m_left)) {
             if (m_move.x < 0) {
                 m_move.x *= -1.0f;
             }
-        } else if (this.doesCollide (thisBounds, m_topWall)) {
+        } else if (this.doesCollide (thisBounds, m_walls.m_top)) {
             if (m_move.y > 0) {
                 m_move.y *= -1.0f;
             }
@@ -102,7 +113,7 @@ public class BallController : MonoBehaviour {
 
             if (m_lives <= 0)
             {
-                m_gameOverText.GetComponent<CanvasGroup>().alpha = 1.0f;
+                m_ui.m_gameOverText.GetComponent<CanvasGroup>().alpha = 1.0f;
             }
         }
         
